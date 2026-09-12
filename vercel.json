@@ -1,8 +1,16 @@
 {
-  "version": 2,
+  "functions": {
+    "api/*.js": {
+      "includeFiles": "index.html,style.css,script.js"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
+      "destination": "/api"
+    },
+    {
+      "source": "/(.*)",
       "destination": "/api"
     }
   ]

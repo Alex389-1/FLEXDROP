@@ -358,8 +358,53 @@ app.get(['/api', '/api/health', '/health'], (req, res) => {
   res.json({ status: 'ok', service: 'FlexDrop API', timestamp: new Date().toISOString() });
 });
 
-// Serve static assets for local execution
-app.use(express.static(path.join(__dirname)));
+// Static directories to search across environments (local and Vercel serverless)
+const staticRoots = [
+  path.resolve(__dirname),
+  path.resolve(process.cwd()),
+  path.resolve(__dirname, '..')
+];
+
+// Mount static middleware for all possible roots
+staticRoots.forEach(dir => {
+  try {
+    app.use(express.static(dir));
+  } catch (e) {}
+});
+
+// Explicit route for homepage / index.html
+app.get(['/', '/index.html'], (req, res) => {
+  for (const root of staticRoots) {
+    const candidate = path.join(root, 'index.html');
+    if (fs.existsSync(candidate)) {
+      return res.sendFile(candidate);
+    }
+  }
+  res.sendFile(path.resolve('index.html'));
+});
+
+// Explicit static handlers for style and script
+app.get('/style.css', (req, res) => {
+  for (const root of staticRoots) {
+    const candidate = path.join(root, 'style.css');
+    if (fs.existsSync(candidate)) {
+      res.setHeader('Content-Type', 'text/css');
+      return res.sendFile(candidate);
+    }
+  }
+  res.sendFile(path.resolve('style.css'));
+});
+
+app.get('/script.js', (req, res) => {
+  for (const root of staticRoots) {
+    const candidate = path.join(root, 'script.js');
+    if (fs.existsSync(candidate)) {
+      res.setHeader('Content-Type', 'application/javascript');
+      return res.sendFile(candidate);
+    }
+  }
+  res.sendFile(path.resolve('script.js'));
+});
 
 if (require.main === module) {
   app.listen(PORT, () => {
@@ -368,3 +413,4 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
