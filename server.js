@@ -1,49 +1,56 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(express.static('.'));
 
 const fs = require('fs');
 const path = require('path');
-const LOG_FILE = path.join(__dirname, 'chat_logs.txt');
-const USER_DETAILS_FILE = path.join(__dirname, 'user_details.txt');
-const REVIEWS_LOG_FILE = path.join(__dirname, 'reviews_log.txt');
+const os = require('os');
+
+// On serverless environments (like Vercel), the root file system is read-only.
+// Use os.tmpdir() on Vercel, and __dirname for local development.
+const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const baseDir = isServerless ? os.tmpdir() : __dirname;
+
+const LOG_FILE = path.join(baseDir, 'chat_logs.txt');
+const USER_DETAILS_FILE = path.join(baseDir, 'user_details.txt');
+const REVIEWS_LOG_FILE = path.join(baseDir, 'reviews_log.txt');
+
+function safeInitFile(filePath, header) {
+  try {
+    if (!fs.existsSync(filePath)) {
+      fs.writeFileSync(filePath, header, 'utf8');
+    }
+  } catch (err) {
+    console.warn(`[Notice] File system init bypassed for ${path.basename(filePath)}:`, err.message);
+  }
+}
 
 // Initialize chat log file with header if it doesn't exist
-if (!fs.existsSync(LOG_FILE)) {
-  const header = [
-    '================================================================================',
-    '                   FLEXDROP AI CHATBOT - CONVERSATION LOGS                      ',
-    `                   Log file created: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} (IST)`,
-    '================================================================================\n\n'
-  ].join('\n');
-  fs.writeFileSync(LOG_FILE, header, 'utf8');
-}
+safeInitFile(LOG_FILE, [
+  '================================================================================',
+  '                   FLEXDROP AI CHATBOT - CONVERSATION LOGS                      ',
+  `                   Log file created: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} (IST)`,
+  '================================================================================\n\n'
+].join('\n'));
 
 // Initialize user details file with header if it doesn't exist
-if (!fs.existsSync(USER_DETAILS_FILE)) {
-  const userHeader = [
-    '================================================================================',
-    '                     FLEXDROP - SAVED USER DETAILS & ADDRESSES                  ',
-    `                     File created: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} (IST)`,
-    '================================================================================\n\n'
-  ].join('\n');
-  fs.writeFileSync(USER_DETAILS_FILE, userHeader, 'utf8');
-}
+safeInitFile(USER_DETAILS_FILE, [
+  '================================================================================',
+  '                     FLEXDROP - SAVED USER DETAILS & ADDRESSES                  ',
+  `                     File created: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} (IST)`,
+  '================================================================================\n\n'
+].join('\n'));
 
 // Initialize product reviews log file if it doesn't exist
-if (!fs.existsSync(REVIEWS_LOG_FILE)) {
-  const reviewsHeader = [
-    '================================================================================',
-    '                     FLEXDROP - CUSTOMER PRODUCT REVIEWS LOG                    ',
-    `                     File created: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} (IST)`,
-    '================================================================================\n\n'
-  ].join('\n');
-  fs.writeFileSync(REVIEWS_LOG_FILE, reviewsHeader, 'utf8');
-}
+safeInitFile(REVIEWS_LOG_FILE, [
+  '================================================================================',
+  '                     FLEXDROP - CUSTOMER PRODUCT REVIEWS LOG                    ',
+  `                     File created: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} (IST)`,
+  '================================================================================\n\n'
+].join('\n'));
 
 // Function to log saved user details with time and date to local txt file
 function logUserDetails(user) {
@@ -346,6 +353,22 @@ app.post('/api/clear-all-data', (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 FlexDrop running at http://localhost:${PORT}`);
+// Health check and root API status
+app.get('/api', (req, res) => {
+  res.json({ status: 'ok', service: 'FlexDrop API', timestamp: new Date().toISOString() });
 });
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Serve static assets for local execution
+app.use(express.static(path.join(__dirname)));
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 FlexDrop running at http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
