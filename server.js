@@ -176,7 +176,7 @@ function logChatEntry(userMessage, botResponse) {
 }
 
 // Proxy endpoint for Mistral API with retry logic
-app.post('/api/chat', async (req, res) => {
+app.post(['/api/chat', '/chat'], async (req, res) => {
   const maxRetries = 3;
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -270,7 +270,7 @@ app.post('/api/chat', async (req, res) => {
 });
 
 // Endpoint to download server chat logs
-app.get('/api/chat-logs/download', (req, res) => {
+app.get(['/api/chat-logs/download', '/chat-logs/download'], (req, res) => {
   if (fs.existsSync(LOG_FILE)) {
     res.download(LOG_FILE, 'flexdrop_chat_logs.txt');
   } else {
@@ -279,7 +279,7 @@ app.get('/api/chat-logs/download', (req, res) => {
 });
 
 // Endpoint to save user profile and address details
-app.post('/api/save-user', (req, res) => {
+app.post(['/api/save-user', '/save-user'], (req, res) => {
   const userData = req.body;
   if (userData && (userData.name || userData.phone)) {
     logUserDetails(userData);
@@ -289,7 +289,7 @@ app.post('/api/save-user', (req, res) => {
 });
 
 // Endpoint to download saved user details file
-app.get('/api/user-details/download', (req, res) => {
+app.get(['/api/user-details/download', '/user-details/download'], (req, res) => {
   if (fs.existsSync(USER_DETAILS_FILE)) {
     res.download(USER_DETAILS_FILE, 'flexdrop_user_details.txt');
   } else {
@@ -298,7 +298,7 @@ app.get('/api/user-details/download', (req, res) => {
 });
 
 // Endpoint to save a customer product review to server file
-app.post('/api/save-review', (req, res) => {
+app.post(['/api/save-review', '/save-review'], (req, res) => {
   const rev = req.body;
   if (rev && rev.comment) {
     logProductReview(rev);
@@ -308,7 +308,7 @@ app.post('/api/save-review', (req, res) => {
 });
 
 // Endpoint to download saved customer reviews log file
-app.get('/api/reviews/download', (req, res) => {
+app.get(['/api/reviews/download', '/reviews/download'], (req, res) => {
   if (fs.existsSync(REVIEWS_LOG_FILE)) {
     res.download(REVIEWS_LOG_FILE, 'flexdrop_reviews_log.txt');
   } else {
@@ -317,7 +317,7 @@ app.get('/api/reviews/download', (req, res) => {
 });
 
 // Endpoint to wipe/reset all demo log files on server
-app.post('/api/clear-all-data', (req, res) => {
+app.post(['/api/clear-all-data', '/clear-all-data'], (req, res) => {
   try {
     const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
@@ -354,12 +354,8 @@ app.post('/api/clear-all-data', (req, res) => {
 });
 
 // Health check and root API status
-app.get('/api', (req, res) => {
+app.get(['/api', '/api/health', '/health'], (req, res) => {
   res.json({ status: 'ok', service: 'FlexDrop API', timestamp: new Date().toISOString() });
-});
-
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // Serve static assets for local execution
