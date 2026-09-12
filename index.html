@@ -443,11 +443,6 @@
        AI CHATBOT — FLEXDROP ASSISTANT (Mistral)
   ══════════════════════════════════════════ -->
 
-  <!-- Floating Option at Right Bottom -->
-  <button class="clear-cache-floating-btn" id="clearCacheFloatingBtn" onclick="clearAllCachedData()" title="Reset all demo data and start fresh">
-    <span>🧹</span> Clear Cached Data
-  </button>
-
   <!-- Chatbot FAB -->
   <button class="chatbot-fab" id="chatbotFab" onclick="toggleChatbot()">
     <span class="fab-icon" id="fabIcon">💬</span>
@@ -542,58 +537,21 @@
       100% { transform: scale(1.35); opacity: 0; }
     }
 
-    /* ── CLEAR CACHE FLOATING BUTTON (Right Bottom) ── */
-    .clear-cache-floating-btn {
-      position: fixed;
-      bottom: 100px;
-      right: 28px;
-      background: rgba(26, 18, 0, 0.92);
-      color: #FFB74D;
-      border: 1.5px solid rgba(255, 183, 77, 0.45);
-      backdrop-filter: blur(8px);
-      padding: 6px 13px;
-      border-radius: 20px;
-      font-size: 11.5px;
-      font-weight: 600;
-      cursor: pointer;
-      z-index: 490;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
-      transition: all 0.22s ease;
-      font-family: 'Noto Sans', sans-serif;
-    }
-    .clear-cache-floating-btn:hover {
-      background: #E65100;
-      color: #fff;
-      border-color: #E65100;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 22px rgba(230, 81, 0, 0.45);
-    }
-
-    /* Hide FAB, Clear Cache Option, and Chatbot Window when any Drawer or Modal is open to prevent overlapping */
+    /* Hide FAB and Chatbot Window when any Drawer or Modal is open to prevent overlapping */
     body.drawer-open .chatbot-fab,
     body.drawer-open .chatbot-window,
-    body.drawer-open .clear-cache-floating-btn,
     body:has(.cart-drawer.open) .chatbot-fab,
     body:has(.cart-drawer.open) .chatbot-window,
-    body:has(.cart-drawer.open) .clear-cache-floating-btn,
     body:has(.orders-drawer.open) .chatbot-fab,
     body:has(.orders-drawer.open) .chatbot-window,
-    body:has(.orders-drawer.open) .clear-cache-floating-btn,
     body:has(.custom-drawer.open) .chatbot-fab,
     body:has(.custom-drawer.open) .chatbot-window,
-    body:has(.custom-drawer.open) .clear-cache-floating-btn,
     body:has(.prod-modal-overlay.open) .chatbot-fab,
     body:has(.prod-modal-overlay.open) .chatbot-window,
-    body:has(.prod-modal-overlay.open) .clear-cache-floating-btn,
     body:has(.cancel-modal-overlay.open) .chatbot-fab,
     body:has(.cancel-modal-overlay.open) .chatbot-window,
-    body:has(.cancel-modal-overlay.open) .clear-cache-floating-btn,
     body:has(#policyOverlay.open) .chatbot-fab,
-    body:has(#policyOverlay.open) .chatbot-window,
-    body:has(#policyOverlay.open) .clear-cache-floating-btn {
+    body:has(#policyOverlay.open) .chatbot-window {
       opacity: 0 !important;
       pointer-events: none !important;
       transform: scale(0.5) translateY(24px) !important;
