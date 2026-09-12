@@ -11,73 +11,70 @@ FlexDrop is a fast, responsive delivery web application for Indian groceries, st
 - **AI Shopping Assistant**: Mistral-powered streaming conversational chatbot for instant grocery and shopping support.
 - **1-Click Demo Reset**: Clear all cached data anytime with a single click.
 
-## Prerequisites
+## Prerequisites (Windows)
 
-You need **Node.js** (v18 or higher recommended) and **npm** installed on your system.
+You need **Node.js** (v18 or higher recommended) and **npm** installed on your Windows system.
 
-### 1. Install Node.js & npm
-
-#### On Linux (Ubuntu / Debian / Mint):
-```bash
-# Update package list and install Node.js + npm
-sudo apt update
-sudo apt install -y nodejs npm
-
-# Verify installation:
-node -v
-npm -v
-```
-*(Optional: To install the latest LTS version via NodeSource)*:
-```bash
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt install -y nodejs
-```
-
-#### On Windows / macOS:
-1. Download the LTS installer from [nodejs.org](https://nodejs.org/).
-2. Run the installer and follow the on-screen wizard.
-3. Open your terminal / command prompt and check:
-   ```bash
-   node -v
-   npm -v
-   ```
+### 1. Download & Install Node.js on Windows
+1. Download the Windows **LTS Installer (.msi)** from the official site:
+   👉 **[https://nodejs.org](https://nodejs.org/)**
+2. Run the downloaded installer (`.msi` file).
+3. Follow the installation wizard:
+   - Accept the license agreement.
+   - Leave default install path (`C:\Program Files\nodejs\`).
+   - Keep default components selected (includes `npm package manager`).
+   - Click **Next** and then **Finish**.
+4. Verify the installation:
+   - Open **Command Prompt** (press `Win + R`, type `cmd`, and press Enter) or **PowerShell**.
+   - Type the following commands:
+     ```cmd
+     node -v
+     npm -v
+     ```
+   *(Both should print the installed version numbers, e.g., `v20.x.x` and `10.x.x`).*
 
 ---
 
-## Step-by-Step Setup & Run Guide
+## Step-by-Step Setup & Run Guide (Windows)
 
-### Step 1: Open the Project Directory
-Open your terminal and navigate to the project directory:
-```bash
-cd /path/to/FLEXDROP
+### Step 1: Open the Project Folder in Terminal
+Open **Command Prompt**, **PowerShell**, or the integrated terminal in **VS Code**:
+```cmd
+cd C:\path\to\FLEXDROP
 ```
+*(Tip: In Windows File Explorer, you can simply open the project folder, click on the address bar at the top, type `cmd`, and hit Enter).*
 
 ### Step 2: Install Project Dependencies
-Run `npm install` to install Express and dotenv:
-```bash
+Run `npm install` to install all necessary packages (`express`, `dotenv`):
+```cmd
 npm install
 ```
 
-### Step 3: Configure Environment Variables
-Create or verify your `.env` file in the project root directory:
-```bash
-# Create or edit .env
-nano .env
+### Step 3: Configure Environment Variables (`.env`)
+You can quickly copy the template to create your `.env` file:
+```cmd
+copy .env.example .env
 ```
-Add the following content:
+Or open/create `.env` using Notepad:
+```cmd
+notepad .env
+```
+Ensure your `.env` contains:
 ```env
 PORT=3000
 MISTRAL_API_KEY=your_mistral_api_key_here
 ```
-> **Note**: You can get a free Mistral API key at [console.mistral.ai](https://console.mistral.ai/). If no key is provided, the core delivery app will work normally, but the AI chatbot assistant will show an API key notice.
+*(Save and close Notepad with `Ctrl + S`).*
+
+> **Note**: You can get a free Mistral API key at [console.mistral.ai](https://console.mistral.ai/). The delivery app and all shopping features will work even without the key; the key is only needed for the AI shopping chatbot assistant.
 
 ### Step 4: Start the Server
-Start the Node.js server:
-```bash
+Run the start command:
+```cmd
 npm start
 ```
-*Or run directly:*
-```bash
+*Or directly via Node:*
+```cmd
 node server.js
 ```
 
@@ -88,28 +85,30 @@ Mistral API key configured: Yes
 ```
 
 ### Step 5: Open in Your Browser
-Open your favorite web browser and visit:
+Open Chrome, Edge, or any browser and navigate to:
 👉 **[http://localhost:3000](http://localhost:3000)**
 
 ---
 
-## Useful Tips & Troubleshooting
+## Windows Tips & Troubleshooting
 
-- **Stop the Server**: Press `Ctrl + C` in the terminal running the server.
+- **Stop the Server**: Press `Ctrl + C` in the Command Prompt / PowerShell window, and type `Y` when prompted.
 - **Port 3000 already in use?**
   - Change the port when running:
-    ```bash
-    PORT=3001 npm start
-    ```
-  - Or terminate the existing process occupying port 3000:
-    ```bash
+    - **In Command Prompt (CMD)**:
+      ```cmd
+      set PORT=3001 && npm start
+      ```
+    - **In PowerShell**:
+      ```powershell
+      $env:PORT="3001"; npm start
+      ```
+  - Or terminate the program on port 3000:
+    ```cmd
     npx kill-port 3000
     ```
 - **Resetting Demo Data**:
-  - Click the **"Reset Demo Data"** floating button at the bottom right corner of the website, or run:
-    ```bash
-    curl -X POST http://localhost:3000/api/clear-all-data
-    ```
+  - Click the **"Reset Demo Data"** floating button at the bottom right corner of the website to wipe cached orders, cart, and reviews.
 - **Project Structure**:
   - `server.js` — Express backend handling static files, Mistral streaming API, and data logging.
   - `index.html` — Main single-page application structure.
