@@ -50,25 +50,7 @@ Run `npm install` to install all necessary packages (`express`, `dotenv`):
 npm install
 ```
 
-### Step 3: Configure Environment Variables (`.env`)
-You can quickly copy the template to create your `.env` file:
-```cmd
-copy .env.example .env
-```
-Or open/create `.env` using Notepad:
-```cmd
-notepad .env
-```
-Ensure your `.env` contains:
-```env
-PORT=3000
-MISTRAL_API_KEY=your_mistral_api_key_here
-```
-*(Save and close Notepad with `Ctrl + S`).*
-
-> **Note**: You can get a free Mistral API key at [console.mistral.ai](https://console.mistral.ai/). The delivery app and all shopping features will work even without the key; the key is only needed for the AI shopping chatbot assistant.
-
-### Step 4: Start the Server
+### Step 3: Start the Server
 Run the start command:
 ```cmd
 npm start
@@ -84,7 +66,7 @@ FlexDrop server running on http://localhost:3000
 Mistral API key configured: Yes
 ```
 
-### Step 5: Open in Your Browser
+### Step 4: Open in Your Browser
 Open Chrome, Edge, or any browser and navigate to:
 👉 **[http://localhost:3000](http://localhost:3000)**
 
