@@ -72,26 +72,6 @@ Open Chrome, Edge, or any browser and navigate to:
 
 ---
 
-## Deploy to Vercel (1-Click Deployment)
-
-This project is pre-configured for **Vercel** with zero extra setup needed (`vercel.json` and serverless API handlers in `api/index.js` are ready).
-
-### Option A: Via Vercel Dashboard (Easiest)
-1. Go to **[vercel.com](https://vercel.com/)** and log in with your GitHub account.
-2. Click **"Add New..."** ➔ **"Project"**.
-3. Import your GitHub repository: `Alex389-1/FLEXDROP`.
-4. Under **Environment Variables**, add:
-   - `MISTRAL_API_KEY`: *(your Mistral AI API key)*
-5. Click **Deploy**. Vercel will build and launch your live URL in under a minute!
-
-### Option B: Via Vercel CLI
-```cmd
-npm i -g vercel
-vercel
-```
-
----
-
 ## Windows Tips & Troubleshooting
 
 - **Stop the Server**: Press `Ctrl + C` in the Command Prompt / PowerShell window, and type `Y` when prompted.
