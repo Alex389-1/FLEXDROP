@@ -23,6 +23,9 @@
     </div>
     <div class="header-right">
       <input class="search-bar" type="text" placeholder="🔍 Search products..." id="searchInput" oninput="filterProducts()">
+      <button class="cart-btn" onclick="openOrdersModal()" style="background:rgba(255,255,255,0.22);color:#fff;border:1.5px solid rgba(255,255,255,0.45);" title="View placed orders">
+        📦 Orders <span class="cart-count" id="ordersCount" style="background:var(--leaf);">0</span>
+      </button>
       <button class="cart-btn" onclick="openCart()">
         🛒 Cart <span class="cart-count" id="cartCount">0</span>
       </button>
@@ -164,7 +167,7 @@
                 <option value="+44">🇬🇧 +44</option>
                 <option value="+971">🇦🇪 +971</option>
               </select>
-              <input type="tel" id="fPhone" placeholder="98765 43210" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')">
+              <input type="tel" id="fPhone" placeholder="92341 68770" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')">
             </div>
           </div>
         </div>
@@ -208,7 +211,7 @@
         <div class="otp-hero-card">
           <div style="font-size:48px;">💬</div>
           <div class="otp-sent-to">OTP sent to <span id="otpSentTo">+91 XXXXXXXXXX</span></div>
-          <div class="demo-badge">⚡ DEMO OTP: <strong id="demoOtpShow">——</strong></div>
+          <div class="demo-badge" onclick="autoFillDemoOtp()" style="cursor:pointer;" title="Click to auto-fill OTP">⚡ DEMO OTP: <strong id="demoOtpShow">——</strong> (Tap to Fill)</div>
         </div>
         <div class="form-card" style="width:100%">
           <div class="form-card-title">🔐 Enter 6-digit OTP</div>
@@ -307,6 +310,7 @@
           <div class="oid-val" id="successOrderId">#FD-000000</div>
         </div>
         <div class="eta-bar">🚚 Delivering to <span id="successCity">your city</span></div>
+        <button class="place-order-btn orange-btn" style="margin-top:8px;" onclick="closeCart();openOrdersModal();">📦 View in My Orders</button>
         <button class="place-order-btn" style="margin-top:8px;" onclick="resetCheckout()">🛒 Continue Shopping</button>
       </div>
     </div>
@@ -348,6 +352,61 @@
     <div class="custom-footer">
       <button class="custom-submit-btn" onclick="submitCustomOrder()">📲 Send Custom Order via WhatsApp</button>
     </div>
+  </div><!-- /custom-drawer -->
+
+  <!-- ── MY ORDERS DRAWER ── -->
+  <div class="orders-overlay" id="ordersOverlay" onclick="closeOrdersModal()"></div>
+  <div class="orders-drawer" id="ordersDrawer">
+    <div class="orders-header">
+      <h2>📦 My Orders</h2>
+      <button class="close-x" style="background:rgba(255,255,255,0.25);color:#fff;" onclick="closeOrdersModal()">✕</button>
+    </div>
+    <div class="orders-body" id="ordersListContainer"></div>
+  </div>
+
+  <!-- ── CANCEL ORDER MODAL ── -->
+  <div class="cancel-modal-overlay" id="cancelOrderOverlay" onclick="closeCancelDialogIfBg(event)">
+    <div class="cancel-modal">
+      <div class="cancel-modal-head">
+        <h3 id="cancelModalTitle">✕ Cancel Order</h3>
+        <button class="close-x" style="background:rgba(255,255,255,0.25);color:#fff;" onclick="closeCancelDialog()">✕</button>
+      </div>
+      <div class="cancel-modal-body">
+        <div style="font-size:13.5px; color:#1A1200; font-weight:600;">Please select a reason for cancellation:</div>
+        <div class="cancel-reasons-list">
+          <label class="cancel-reason-opt">
+            <input type="radio" name="cancelReason" value="Ordered by mistake" checked>
+            <span>Ordered by mistake</span>
+          </label>
+          <label class="cancel-reason-opt">
+            <input type="radio" name="cancelReason" value="Need to change delivery address or items">
+            <span>Need to change delivery address or items</span>
+          </label>
+          <label class="cancel-reason-opt">
+            <input type="radio" name="cancelReason" value="Delivery time is too long">
+            <span>Delivery time is too long</span>
+          </label>
+          <label class="cancel-reason-opt">
+            <input type="radio" name="cancelReason" value="Placed a duplicate order">
+            <span>Placed a duplicate order</span>
+          </label>
+          <label class="cancel-reason-opt">
+            <input type="radio" name="cancelReason" value="Other">
+            <span>Other reason</span>
+          </label>
+        </div>
+        <textarea id="cancelReasonDetails" placeholder="Provide any additional comments (optional)..." style="width:100%; border:1.5px solid #F0E0C8; border-radius:10px; padding:8px 12px; font-size:13px; font-family:'Noto Sans',sans-serif; min-height:60px; outline:none; background:#FFF8F0; resize:none;"></textarea>
+      </div>
+      <div class="cancel-modal-footer">
+        <button class="cancel-btn-back" onclick="closeCancelDialog()">Keep Order</button>
+        <button class="cancel-btn-confirm" onclick="confirmCancelOrder()">Confirm Cancellation</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PRODUCT DETAILS & REVIEWS MODAL ── -->
+  <div class="prod-modal-overlay" id="prodModalOverlay" onclick="closeProductModalIfBg(event)">
+    <div class="prod-modal" id="prodModal"></div>
   </div>
 
   <!-- ── POLICY POPUP ── -->
@@ -363,48 +422,808 @@
 
   <!-- ── FOOTER ── -->
   <footer>
-    <a href="#" onclick="openPolicy('about');return false;" class="shreya">About Us</a>
-    <a href="#" onclick="openPolicy('privacy');return false;" class="shreya">Privacy and Policies</a>
-    <a href="#" onclick="openPolicy('terms');return false;" class="shreya">Terms &amp; Conditions</a>
-    <a href="#" onclick="openPolicy('return');return false;" class="shreya">Return &amp; refund</a>
-    <a href="#" onclick="openPolicy('contact');return false;" class="shreya">Contact Us</a>
-    <br><br>
-    Made with ❤️ for India &nbsp;|&nbsp; <span>FLEXDROP</span> &nbsp;|&nbsp; &copy; 2026
+    <div class="footer-links">
+      <a href="#" onclick="openPolicy('about');return false;" class="shreya">About Us</a>
+      <a href="#" onclick="openPolicy('privacy');return false;" class="shreya">Privacy and Policies</a>
+      <a href="#" onclick="openPolicy('terms');return false;" class="shreya">Terms &amp; Conditions</a>
+      <a href="#" onclick="openPolicy('return');return false;" class="shreya">Return &amp; refund</a>
+      <a href="#" onclick="openPolicy('contact');return false;" class="shreya">Contact Us</a>
+    </div>
+    <div class="footer-bottom-row">
+      <div class="footer-copy">Made with ❤️ for India &nbsp;|&nbsp; <span>FLEXDROP</span> &nbsp;|&nbsp; &copy; 2026</div>
+      <button class="footer-clear-btn" onclick="clearAllCachedData()" title="Reset all demo data (Cart, Orders, Address, Reviews)">
+        🧹 Clear Cached Data
+      </button>
+    </div>
   </footer>
 
   <script src="script.js"></script>
-  <script>
-    /* ── Stationery sub-filter ── */
-    const stationeryMap = {
-      Writing:   [205,206,207,208,220,221,222,226],
-      Notebooks: [201,202,203,204],
-      Art:       [209,210,223,224,225],
-      Office:    [211,212,213,214,215,216,217,218,219,227,228,229,230],
-    };
-    function filterStationery(group, btn) {
-      document.querySelectorAll('.stationery-cat').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const ids = stationeryMap[group];
-      const grid = document.getElementById('stationeryGrid');
-      const list = ids ? stationeryProducts.filter(p => ids.includes(p.id)) : stationeryProducts;
-      grid.innerHTML = list.map(renderProductCard).join('');
+
+  <!-- ══════════════════════════════════════════
+       AI CHATBOT — FLEXDROP ASSISTANT (Mistral)
+  ══════════════════════════════════════════ -->
+
+  <!-- Floating Option at Right Bottom -->
+  <button class="clear-cache-floating-btn" id="clearCacheFloatingBtn" onclick="clearAllCachedData()" title="Reset all demo data and start fresh">
+    <span>🧹</span> Clear Cached Data
+  </button>
+
+  <!-- Chatbot FAB -->
+  <button class="chatbot-fab" id="chatbotFab" onclick="toggleChatbot()">
+    <span class="fab-icon" id="fabIcon">💬</span>
+    <span class="fab-pulse"></span>
+  </button>
+
+  <!-- Chatbot Window -->
+  <div class="chatbot-window" id="chatbotWindow">
+    <div class="chatbot-header">
+      <div class="chatbot-header-left">
+        <div class="chatbot-avatar">🤖</div>
+        <div>
+          <div class="chatbot-title">FlexDrop Assistant</div>
+          <div class="chatbot-status" id="chatbotStatus">
+            <span class="status-dot"></span> Online
+          </div>
+        </div>
+      </div>
+      <div class="chatbot-header-actions">
+        <button class="chatbot-action-btn" onclick="clearChat()" title="Clear chat">🗑️</button>
+        <button class="chatbot-close-btn" onclick="toggleChatbot()" title="Close chat">✕</button>
+      </div>
+    </div>
+    <div class="chatbot-body" id="chatbotBody">
+      <div class="chat-welcome">
+        <div class="chat-welcome-icon">🥘</div>
+        <div class="chat-welcome-title">Namaste! 🙏</div>
+        <div class="chat-welcome-sub">I'm your FlexDrop AI assistant. Ask me about products, orders, delivery, or anything grocery-related!</div>
+        <div class="chat-suggestions">
+          <button class="chat-suggest-btn" onclick="sendSuggestion('What products do you have?')">🛒 Browse products</button>
+          <button class="chat-suggest-btn" onclick="sendSuggestion('What are today\'s deals?')">🔥 Today's deals</button>
+          <button class="chat-suggest-btn" onclick="sendSuggestion('Tell me about delivery options')">🚚 Delivery info</button>
+          <button class="chat-suggest-btn" onclick="sendSuggestion('Do you have organic items?')">🌿 Organic items</button>
+        </div>
+      </div>
+    </div>
+    <div class="chatbot-footer">
+      <div class="chatbot-input-row">
+        <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter')sendMessage()">
+        <button class="chatbot-send-btn" id="chatbotSendBtn" onclick="sendMessage()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+      <div class="chatbot-powered">Powered by Mistral AI ⚡</div>
+    </div>
+  </div>
+
+  <!-- Chatbot Styles -->
+  <style>
+    /* ── CHATBOT FAB ── */
+    .chatbot-fab {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--saffron) 0%, #E65100 100%);
+      border: none;
+      cursor: pointer;
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 28px rgba(255, 111, 0, 0.5), 0 0 0 0 rgba(255, 111, 0, 0.4);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: fabEntrance 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    @keyframes fabEntrance {
+      from { transform: scale(0) rotate(-180deg); opacity: 0; }
+      to   { transform: scale(1) rotate(0deg);   opacity: 1; }
+    }
+    .chatbot-fab:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 35px rgba(255, 111, 0, 0.6);
+    }
+    .chatbot-fab:active { transform: scale(0.95); }
+    .fab-icon { font-size: 28px; transition: transform 0.3s; }
+    .chatbot-fab.open .fab-icon { transform: rotate(90deg); }
+
+    .fab-pulse {
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 3px solid var(--saffron);
+      animation: fabPulse 2s infinite;
+    }
+    .chatbot-fab.open .fab-pulse { animation: none; opacity: 0; }
+    @keyframes fabPulse {
+      0%   { transform: scale(1);   opacity: 0.6; }
+      70%  { transform: scale(1.35); opacity: 0; }
+      100% { transform: scale(1.35); opacity: 0; }
     }
 
-    /* ── Medicine sub-filter ── */
-    const medicineMap = {
-      FirstAid: [304,305,306,307,308,309,310,320,327,328,329,330],
-      OTC:      [311,312,313,314,315,322,323,326],
-      Topical:  [301,302,303,316,317,318,319,321],
-      Hygiene:  [324,325,327,328,329],
-    };
-    function filterMedicine(group, btn) {
-      document.querySelectorAll('.medicine-cat').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const ids = medicineMap[group];
-      const grid = document.getElementById('medicineGrid');
-      const list = ids ? medicineProducts.filter(p => ids.includes(p.id)) : medicineProducts;
-      grid.innerHTML = list.map(renderProductCard).join('');
+    /* ── CLEAR CACHE FLOATING BUTTON (Right Bottom) ── */
+    .clear-cache-floating-btn {
+      position: fixed;
+      bottom: 100px;
+      right: 28px;
+      background: rgba(26, 18, 0, 0.92);
+      color: #FFB74D;
+      border: 1.5px solid rgba(255, 183, 77, 0.45);
+      backdrop-filter: blur(8px);
+      padding: 6px 13px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      z-index: 490;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+      transition: all 0.22s ease;
+      font-family: 'Noto Sans', sans-serif;
     }
+    .clear-cache-floating-btn:hover {
+      background: #E65100;
+      color: #fff;
+      border-color: #E65100;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(230, 81, 0, 0.45);
+    }
+
+    /* Hide FAB, Clear Cache Option, and Chatbot Window when any Drawer or Modal is open to prevent overlapping */
+    body.drawer-open .chatbot-fab,
+    body.drawer-open .chatbot-window,
+    body.drawer-open .clear-cache-floating-btn,
+    body:has(.cart-drawer.open) .chatbot-fab,
+    body:has(.cart-drawer.open) .chatbot-window,
+    body:has(.cart-drawer.open) .clear-cache-floating-btn,
+    body:has(.orders-drawer.open) .chatbot-fab,
+    body:has(.orders-drawer.open) .chatbot-window,
+    body:has(.orders-drawer.open) .clear-cache-floating-btn,
+    body:has(.custom-drawer.open) .chatbot-fab,
+    body:has(.custom-drawer.open) .chatbot-window,
+    body:has(.custom-drawer.open) .clear-cache-floating-btn,
+    body:has(.prod-modal-overlay.open) .chatbot-fab,
+    body:has(.prod-modal-overlay.open) .chatbot-window,
+    body:has(.prod-modal-overlay.open) .clear-cache-floating-btn,
+    body:has(.cancel-modal-overlay.open) .chatbot-fab,
+    body:has(.cancel-modal-overlay.open) .chatbot-window,
+    body:has(.cancel-modal-overlay.open) .clear-cache-floating-btn,
+    body:has(#policyOverlay.open) .chatbot-fab,
+    body:has(#policyOverlay.open) .chatbot-window,
+    body:has(#policyOverlay.open) .clear-cache-floating-btn {
+      opacity: 0 !important;
+      pointer-events: none !important;
+      transform: scale(0.5) translateY(24px) !important;
+      visibility: hidden !important;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    /* ── CHATBOT WINDOW ── */
+    .chatbot-window {
+      position: fixed;
+      bottom: 100px;
+      right: 28px;
+      width: 380px;
+      height: 540px;
+      background: var(--cream);
+      border-radius: 22px;
+      box-shadow: 0 20px 70px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(240, 224, 200, 0.6);
+      z-index: 501;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+      pointer-events: none;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .chatbot-window.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: all;
+    }
+
+    /* ── HEADER ── */
+    .chatbot-header {
+      background: linear-gradient(135deg, var(--saffron) 0%, #E65100 100%);
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .chatbot-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .chatbot-avatar {
+      width: 42px;
+      height: 42px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      backdrop-filter: blur(6px);
+      border: 2px solid rgba(255,255,255,0.3);
+    }
+    .chatbot-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .chatbot-status {
+      font-size: 11px;
+      color: rgba(255,255,255,0.8);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 500;
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: #69F0AE;
+      border-radius: 50%;
+      display: inline-block;
+      animation: statusPulse 2s infinite;
+    }
+    @keyframes statusPulse {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0.4; }
+    }
+    .chatbot-header-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .chatbot-action-btn, .chatbot-clear-btn, .chatbot-close-btn {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: #fff;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.15s;
+      backdrop-filter: blur(4px);
+    }
+    .chatbot-action-btn:hover, .chatbot-clear-btn:hover, .chatbot-close-btn:hover {
+      background: rgba(255,255,255,0.3);
+      transform: scale(1.06);
+    }
+
+    /* ── BODY ── */
+    .chatbot-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scroll-behavior: smooth;
+      background: linear-gradient(180deg, #FFF8F0 0%, #FFF3E0 100%);
+    }
+    .chatbot-body::-webkit-scrollbar { width: 5px; }
+    .chatbot-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+    /* ── WELCOME ── */
+    .chat-welcome {
+      text-align: center;
+      padding: 16px 8px 8px;
+      animation: welcomeFadeIn 0.6s ease;
+    }
+    @keyframes welcomeFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .chat-welcome-icon {
+      font-size: 48px;
+      margin-bottom: 8px;
+      animation: welcomeBounce 2s ease infinite;
+    }
+    @keyframes welcomeBounce {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-8px); }
+    }
+    .chat-welcome-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 6px;
+    }
+    .chat-welcome-sub {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+      max-width: 280px;
+      margin: 0 auto 16px;
+    }
+    .chat-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+    .chat-suggest-btn {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--saffron);
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .chat-suggest-btn:hover {
+      background: var(--saffron);
+      color: #fff;
+      border-color: var(--saffron);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(255,111,0,0.25);
+    }
+
+    /* ── MESSAGE BUBBLES ── */
+    .chat-msg {
+      display: flex;
+      gap: 8px;
+      max-width: 88%;
+      animation: msgSlideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes msgSlideIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .chat-msg.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+    .chat-msg-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .chat-msg.bot .chat-msg-avatar {
+      background: linear-gradient(135deg, var(--saffron), #E65100);
+    }
+    .chat-msg.user .chat-msg-avatar {
+      background: linear-gradient(135deg, var(--leaf), var(--leaf-light));
+    }
+
+    .chat-msg-bubble {
+      padding: 11px 15px;
+      border-radius: 18px;
+      font-size: 13.5px;
+      line-height: 1.55;
+      position: relative;
+      word-wrap: break-word;
+    }
+    .chat-msg.bot .chat-msg-bubble {
+      background: #fff;
+      color: var(--dark);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .chat-msg.user .chat-msg-bubble {
+      background: linear-gradient(135deg, var(--saffron) 0%, #E65100 100%);
+      color: #fff;
+      border-bottom-right-radius: 6px;
+      box-shadow: 0 3px 12px rgba(255,111,0,0.25);
+    }
+    .chat-msg-time {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 4px;
+      opacity: 0.7;
+    }
+    .chat-msg.user .chat-msg-time {
+      text-align: right;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* ── TYPING INDICATOR ── */
+    .typing-indicator {
+      display: flex;
+      gap: 8px;
+      max-width: 88%;
+      animation: msgSlideIn 0.35s ease;
+    }
+    .typing-dots {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      border-bottom-left-radius: 6px;
+      padding: 14px 18px;
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .typing-dots span {
+      width: 8px;
+      height: 8px;
+      background: var(--saffron);
+      border-radius: 50%;
+      animation: typingBounce 1.4s infinite;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30%            { transform: translateY(-8px); opacity: 1; }
+    }
+
+    /* ── FOOTER ── */
+    .chatbot-footer {
+      padding: 12px 14px 14px;
+      background: #fff;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .chatbot-input-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .chatbot-input {
+      flex: 1;
+      background: var(--cream);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 11px 16px;
+      font-size: 13.5px;
+      color: var(--dark);
+      font-family: 'Noto Sans', sans-serif;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .chatbot-input::placeholder { color: var(--muted); opacity: 0.6; }
+    .chatbot-input:focus {
+      border-color: var(--saffron);
+      box-shadow: 0 0 0 3px rgba(255, 111, 0, 0.1);
+    }
+    .chatbot-send-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--saffron), #E65100);
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .chatbot-send-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 4px 16px rgba(255,111,0,0.4);
+    }
+    .chatbot-send-btn:active { transform: scale(0.92); }
+    .chatbot-send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .chatbot-powered {
+      text-align: center;
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 8px;
+      opacity: 0.6;
+      font-weight: 500;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 480px) {
+      .chatbot-window {
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+      }
+      .chatbot-fab {
+        bottom: 20px;
+        right: 20px;
+        width: 56px;
+        height: 56px;
+      }
+      .fab-icon { font-size: 24px; }
+    }
+  </style>
+
+  <!-- Chatbot Script -->
+  <script>
+  (function() {
+    /* ─── CONFIG ─── */
+    const CHAT_ENDPOINT = '/api/chat';
+    const MISTRAL_MODEL = 'open-mistral-nemo';
+
+    const SYSTEM_PROMPT = `You are FlexDrop's friendly AI shopping assistant for an Indian grocery delivery website. Your name is "FlexDrop Assistant".
+
+Key details about FlexDrop:
+- We deliver fresh Indian groceries: dal, rice, atta, spices, masalas, vegetables, dairy, ghee, oil, pickles, snacks, beverages, personal care, and cleaning products
+- We also have stationery/school supplies and OTC medicine/first aid sections
+- Free delivery on orders above ₹999
+- Same-day delivery available
+- 100% Fresh & Quality Guaranteed
+- We accept UPI, Credit/Debit Cards, Net Banking, and Cash on Delivery
+- Custom orders available via WhatsApp
+- We do NOT deliver: alcohol, tobacco, prescription medicines, illegal/hazardous items
+
+Behavior:
+- Be warm, helpful, and concise (2-4 sentences max per response)
+- Use occasional Hindi words naturally (like "Namaste", "ji", "bilkul")
+- Use relevant emojis sparingly
+- Help with product recommendations, delivery queries, order help
+- If asked something unrelated, gently redirect to grocery/shopping topics
+- Always be cheerful and professional`;
+
+    const STORAGE_KEY = 'flexdrop_chat_history_v1';
+    let chatHistory = [];
+    let isOpen = false;
+    let isStreaming = false;
+
+    /* ─── DATE & TIME HELPERS ─── */
+    function getTime() {
+      return new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+    }
+
+    function getDateStr() {
+      return new Date().toLocaleDateString('en-IN', {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+
+    /* ─── PERSISTENCE (localStorage) ─── */
+    function saveChatToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(chatHistory));
+      } catch (e) {
+        console.warn('Failed to save chat to localStorage:', e);
+      }
+    }
+
+    function loadChatFromStorage() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            chatHistory = parsed;
+            const body = document.getElementById('chatbotBody');
+            const welcome = body.querySelector('.chat-welcome');
+            if (welcome) welcome.remove();
+
+            chatHistory.forEach(item => {
+              const role = item.role === 'assistant' ? 'bot' : 'user';
+              appendMessage(role, item.content, item.time || getTime(), false);
+            });
+            body.scrollTop = body.scrollHeight;
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load chat from localStorage:', e);
+      }
+    }
+
+    /* ─── TOGGLE ─── */
+    window.toggleChatbot = function() {
+      isOpen = !isOpen;
+      document.getElementById('chatbotWindow').classList.toggle('open', isOpen);
+      document.getElementById('chatbotFab').classList.toggle('open', isOpen);
+      document.getElementById('fabIcon').textContent = isOpen ? '✕' : '💬';
+      if (isOpen) {
+        setTimeout(() => document.getElementById('chatbotInput').focus(), 350);
+      }
+    };
+
+    /* ─── CLEAR CHAT ─── */
+    window.clearChat = function() {
+      if (chatHistory.length > 0) {
+        if (!confirm('Are you sure you want to clear this conversation?')) return;
+      }
+      chatHistory = [];
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch (e) {}
+
+      const body = document.getElementById('chatbotBody');
+      body.innerHTML = `
+        <div class="chat-welcome">
+          <div class="chat-welcome-icon">🥘</div>
+          <div class="chat-welcome-title">Namaste! 🙏</div>
+          <div class="chat-welcome-sub">I'm your FlexDrop AI assistant. Ask me about products, orders, delivery, or anything grocery-related!</div>
+          <div class="chat-suggestions">
+            <button class="chat-suggest-btn" onclick="sendSuggestion('What products do you have?')">🛒 Browse products</button>
+            <button class="chat-suggest-btn" onclick="sendSuggestion('What are today\\'s deals?')">🔥 Today's deals</button>
+            <button class="chat-suggest-btn" onclick="sendSuggestion('Tell me about delivery options')">🚚 Delivery info</button>
+            <button class="chat-suggest-btn" onclick="sendSuggestion('Do you have organic items?')">🌿 Organic items</button>
+          </div>
+        </div>`;
+    };
+
+
+    /* ─── SUGGESTION ─── */
+    window.sendSuggestion = function(text) {
+      document.getElementById('chatbotInput').value = text;
+      sendMessage();
+    };
+
+    /* ─── APPEND MESSAGE ─── */
+    function appendMessage(role, text, timeStr, animate = true) {
+      const body = document.getElementById('chatbotBody');
+      const welcome = body.querySelector('.chat-welcome');
+      if (welcome) welcome.remove();
+
+      const time = timeStr || getTime();
+      const div = document.createElement('div');
+      div.className = `chat-msg ${role}`;
+      if (!animate) {
+        div.style.animation = 'none';
+      }
+      div.innerHTML = `
+        <div class="chat-msg-avatar">${role === 'bot' ? '🤖' : '👤'}</div>
+        <div>
+          <div class="chat-msg-bubble">${formatText(text)}</div>
+          <div class="chat-msg-time">${time}</div>
+        </div>`;
+      body.appendChild(div);
+      body.scrollTop = body.scrollHeight;
+      return div;
+    }
+
+    /* ─── FORMAT TEXT (basic markdown) ─── */
+    function formatText(text) {
+      return text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\n/g, '<br>');
+    }
+
+    /* ─── TYPING INDICATOR ─── */
+    function showTyping() {
+      const body = document.getElementById('chatbotBody');
+      const div = document.createElement('div');
+      div.className = 'typing-indicator';
+      div.id = 'typingIndicator';
+      div.innerHTML = `
+        <div class="chat-msg-avatar" style="background:linear-gradient(135deg, var(--saffron), #E65100);">🤖</div>
+        <div class="typing-dots"><span></span><span></span><span></span></div>`;
+      body.appendChild(div);
+      body.scrollTop = body.scrollHeight;
+    }
+
+    function removeTyping() {
+      const t = document.getElementById('typingIndicator');
+      if (t) t.remove();
+    }
+
+    /* ─── SEND MESSAGE ─── */
+    window.sendMessage = async function() {
+      const input = document.getElementById('chatbotInput');
+      const text = input.value.trim();
+      if (!text || isStreaming) return;
+
+      const userTime = getTime();
+      const userDate = getDateStr();
+
+      input.value = '';
+      appendMessage('user', text, userTime);
+      chatHistory.push({ role: 'user', content: text, time: userTime, date: userDate });
+      saveChatToStorage();
+
+      isStreaming = true;
+      document.getElementById('chatbotSendBtn').disabled = true;
+      document.getElementById('chatbotStatus').innerHTML = '<span class="status-dot" style="background:#FFB300;"></span> Typing...';
+
+      showTyping();
+
+      try {
+        // Prepare context for Mistral API (clean format without local metadata)
+        const messages = [
+          { role: 'system', content: SYSTEM_PROMPT },
+          ...chatHistory.slice(-10).map(m => ({ role: m.role, content: m.content }))
+        ];
+
+        const response = await fetch(CHAT_ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: MISTRAL_MODEL,
+            messages: messages
+          })
+        });
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.message || `API Error ${response.status}`);
+        }
+
+        removeTyping();
+
+        // Streaming response
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let assistantText = '';
+        let msgDiv = null;
+        const botTime = getTime();
+        const botDate = getDateStr();
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split('\n').filter(l => l.trim().startsWith('data: '));
+
+          for (const line of lines) {
+            const data = line.replace('data: ', '').trim();
+            if (data === '[DONE]') break;
+
+            try {
+              const parsed = JSON.parse(data);
+              const delta = parsed.choices?.[0]?.delta?.content;
+              if (delta) {
+                assistantText += delta;
+                if (!msgDiv) {
+                  msgDiv = appendMessage('bot', assistantText, botTime);
+                } else {
+                  msgDiv.querySelector('.chat-msg-bubble').innerHTML = formatText(assistantText);
+                }
+                document.getElementById('chatbotBody').scrollTop = document.getElementById('chatbotBody').scrollHeight;
+              }
+            } catch (e) { /* skip malformed chunks */ }
+          }
+        }
+
+        if (assistantText) {
+          chatHistory.push({ role: 'assistant', content: assistantText, time: botTime, date: botDate });
+          saveChatToStorage();
+        }
+
+      } catch (err) {
+        removeTyping();
+        let errorMsg = '😔 Sorry, I couldn\'t connect right now. Please try again!';
+        if (err.message && err.message.includes('429')) {
+          errorMsg = '⏳ I\'m a bit busy right now! Please wait a few seconds and try again.';
+        }
+        appendMessage('bot', errorMsg);
+        console.error('Chatbot error:', err);
+      } finally {
+        isStreaming = false;
+        document.getElementById('chatbotSendBtn').disabled = false;
+        document.getElementById('chatbotStatus').innerHTML = '<span class="status-dot"></span> Online';
+      }
+    };
+
+    // Load persisted chat history from browser localStorage on page load
+    loadChatFromStorage();
+  })();
   </script>
 
 </body>
